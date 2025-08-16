@@ -1,0 +1,41 @@
+{% extends 'votacao/base.html' %}
+
+{% block title %}Questões - Sistema de Votação{% endblock %}
+
+{% block content %}
+<h2>Lista de Questões</h2>
+
+{% if questoes %}
+    {% for questao in questoes %}
+        <div class="question">
+            <h3>{{ questao.questao_texto }}</h3>
+            <p><em>Publicada em: {{ questao.pub_data|date:"d/m/Y H:i" }}</em></p>
+            
+            {% if questao.opcao_set.all %}
+                <h4>Opções:</h4>
+                {% for opcao in questao.opcao_set.all %}
+                    <div class="option">
+                        <span>{{ opcao.opcao_texto }}</span>
+                        <span style="float: right; color: #666;">{{ opcao.votos }} voto{{ opcao.votos|pluralize:"s" }}</span>
+                    </div>
+                {% endfor %}
+                
+                <div style="margin-top: 15px;">
+                    <a href="{% url 'votacao:detalhe' questao.id %}" class="vote-button">Votar nesta Questão</a>
+                </div>
+            {% else %}
+                <p><em>Nenhuma opção disponível para esta questão.</em></p>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% else %}
+    <p>Nenhuma questão disponível no momento.</p>
+    <p><a href="{% url 'admin:index' %}">Acesse o admin</a> para criar questões.</p>
+{% endif %}
+
+<div style="margin-top: 30px; text-align: center;">
+    <a href="{% url 'votacao:index' %}" class="vote-button" style="text-decoration: none; display: inline-block;">
+        Voltar ao Início
+    </a>
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'votacao/base.html' %}
+
+{% block title %}Início - Sistema de Votação{% endblock %}
+
+{% block content %}
+<h2>Bem-vindo ao Sistema de Votação!</h2>
+
+<p>Este sistema permite criar questões e votar em diferentes opções.</p>
+
+{% if questoes_recentes %}
+    <h3>Questões Recentes:</h3>
+    <div class="questions">
+        {% for questao in questoes_recentes %}
+            <div class="question">
+                <h4>{{ questao.questao_texto }}</h4>
+                <p>Publicada em: {{ questao.pub_data|date:"d/m/Y H:i" }}</p>
+                <a href="{% url 'votacao:detalhe' questao.id %}" class="vote-button">Votar</a>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>Nenhuma questão disponível no momento.</p>
+    <p><a href="{% url 'admin:index' %}">Acesse o admin</a> para criar questões.</p>
+{% endif %}
+
+<div style="margin-top: 30px; text-align: center;">
+    <a href="{% url 'votacao:questoes' %}" class="vote-button" style="text-decoration: none; display: inline-block;">
+        Ver Todas as Questões
+    </a>
+</div>
+{% endblock %}

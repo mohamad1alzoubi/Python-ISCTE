@@ -1,0 +1,35 @@
+{% extends 'votacao/base.html' %}
+
+{% block title %}Login - Sistema de Votação{% endblock %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 0 auto;">
+    <h2>Login</h2>
+    
+    {% if error_message %}
+        <div style="color: red; background-color: #ffe6e6; padding: 10px; border-radius: 4px; margin-bottom: 20px;">
+            {{ error_message }}
+        </div>
+    {% endif %}
+    
+    <form method="post" action="{% url 'votacao:login' %}">
+        {% csrf_token %}
+        <div style="margin-bottom: 15px;">
+            <label for="username" style="display: block; margin-bottom: 5px; font-weight: bold;">Usuário:</label>
+            <input type="text" name="username" id="username" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;">
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <label for="password" style="display: block; margin-bottom: 5px; font-weight: bold;">Senha:</label>
+            <input type="password" name="password" id="password" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;">
+        </div>
+        
+        <button type="submit" class="vote-button" style="width: 100%; font-size: 16px;">Entrar</button>
+    </form>
+    
+    <div style="margin-top: 20px; text-align: center;">
+        <p>Não tem uma conta? <a href="{% url 'votacao:register' %}" style="color: #3498db;">Registre-se</a></p>
+        <p><a href="{% url 'votacao:index' %}" style="color: #666;">Voltar ao Início</a></p>
+    </div>
+</div>
+{% endblock %}
