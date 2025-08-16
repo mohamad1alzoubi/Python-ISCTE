@@ -1,0 +1,172 @@
+{% extends 'votacao/base.html' %}
+
+{% block title %}Resultados - {{ questao.questao_texto }}{% endblock %}
+
+{% block content %}
+<h2>Resultados: {{ questao.questao_texto }}</h2>
+<p><em>Publicada em: {{ questao.pub_data|date:"d/m/Y H:i" }}</em></p>
+
+<div class="results-container">
+    <div class="chart-container" style="margin: 20px 0;">
+        <canvas id="votingChart" width="400" height="200"></canvas>
+    </div>
+    
+    <div class="stats-container">
+        <div class="stat-box">
+            <h3>Total de Votos</h3>
+            <p class="stat-number">{{ questao.total_votos }}</p>
+        </div>
+        <div class="stat-box">
+            <h3>Opções</h3>
+            <p class="stat-number">{{ questao.opcao_set.count }}</p>
+        </div>
+    </div>
+    
+    <div class="detailed-results">
+        <h3>Resultados Detalhados</h3>
+        {% for opcao in questao.opcao_set.all %}
+            <div class="result-item">
+                <div class="result-label">{{ opcao.opcao_texto }}</div>
+                <div class="result-bar">
+                    <div class="bar-fill" style="width: {% if questao.total_votos > 0 %}{{ opcao.votos|floatformat:0 }}{% else %}0{% endif %}%;"></div>
+                </div>
+                <div class="result-count">
+                    {{ opcao.votos }} voto{{ opcao.votos|pluralize:"s" }}
+                    {% if questao.total_votos > 0 %}
+                        ({{ opcao.votos|floatformat:1 }}%)
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div style="margin-top: 30px; text-align: center;">
+    <a href="{% url 'votacao:detalhe' questao.id %}" class="vote-button" style="text-decoration: none; display: inline-block;">
+        Votar Novamente
+    </a>
+    <a href="{% url 'votacao:questoes' %}" class="vote-button" style="text-decoration: none; display: inline-block; margin-left: 10px;">
+        Ver Todas as Questões
+    </a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('votingChart').getContext('2d');
+    
+    const data = {
+        labels: [{% for opcao in questao.opcao_set.all %}'{{ opcao.opcao_texto|escapejs }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Votos',
+            data: [{% for opcao in questao.opcao_set.all %}{{ opcao.votos }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+            backgroundColor: [
+                '#FF6384',
+                '#36A2EB',
+                '#FFCE56',
+                '#4BC0C0',
+                '#9966FF',
+                '#FF9F40'
+            ],
+            borderWidth: 2,
+            borderColor: '#fff'
+        }]
+    };
+    
+    const config = {
+        type: 'doughnut',
+        data: data,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                title: {
+                    display: true,
+                    text: 'Distribuição de Votos'
+                }
+            }
+        }
+    };
+    
+    new Chart(ctx, config);
+});
+</script>
+
+<style>
+.results-container {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.chart-container {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.stats-container {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+
+.stat-box {
+    text-align: center;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    flex: 1;
+    margin: 0 10px;
+}
+
+.stat-number {
+    font-size: 2em;
+    font-weight: bold;
+    color: #3498db;
+    margin: 0;
+}
+
+.detailed-results {
+    margin-top: 30px;
+}
+
+.result-item {
+    display: flex;
+    align-items: center;
+    margin: 15px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.result-label {
+    flex: 2;
+    font-weight: bold;
+}
+
+.result-bar {
+    flex: 3;
+    height: 20px;
+    background: #e9ecef;
+    border-radius: 10px;
+    margin: 0 20px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3498db, #2980b9);
+    transition: width 0.3s ease;
+}
+
+.result-count {
+    flex: 1;
+    text-align: right;
+    font-weight: bold;
+    color: #666;
+}
+</style>
+{% endblock %}
